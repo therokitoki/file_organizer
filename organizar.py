@@ -1,12 +1,29 @@
 import os
 import shutil
 
-choice = int(input("¿Desea correr el script en el directorio actual? Si-1 No-0"))
+#Diccionario de agrupaciones
+EXT_DICT = {
+    "Imágenes" : ["jpg","png","jpeg","gif"],
+    "Documentos" : ["doc","docx","pdf"],
+    "Música" : ["mp3","wav","flac"],
+    "Videos" : ["mp4","mkv"],
+    "Ejecutables" : ["exe","msi"],
+    "APKs": ["apk"],
+    "Sheets": ["xlsx", "xls", "csv"],
+    "Photoshop":["psd"],
+    "Archivos Comprimidos":["zip","rar","7z"]
+}
+
+#Decisión de directorio
+print("Directorio actual: ",os.getcwd())
+choice = int(input("¿Desea correr el script en el directorio actual? Si-1 No-0: "))
 if choice == 1:
     path = os.getcwd()
 else:
     path = input("Ingrese el directorio deseado: (Pegar con ctrl + V)")
-#path = r'C:\Users\rocio\Desktop\Proyecto\Archivos'
+
+print(f"Directorio seleccionado: {path}")
+
 files = []
 extensiones = []
 directories = 0
@@ -19,19 +36,25 @@ for file in os.listdir(path):
     else:
         files.append(file)
         extensiones.append(os.path.splitext(file)[1].replace('.',''))
-#files = os.listdir(path) #returns a list containing the names of the entries in the directory given by path.
 
-print(f"Hay {len(files)} archivo/s y {directories} directorios en el directorio otorgado.")
+
+print(f"Hay {len(files)} archivo/s y {directories} directorios en el directorio otorgado.\n")
 
 menu = 1
 while menu == 1:
-    print(f"Hay {len(files)} archivo/s en el directorio otorgado.")
-    print("¿Qué desea hacer?\n1. Organizar archivos por extensión automaticamente.\n2. Organizar archivos que contengan cierta palabra en su nombre.\n3. Organizar archivos con cierto filetype y cierta palabra en su nombre.\n0. Cancelar")
+    
+    print("¿Qué desea hacer?")
+    print(" 1. Organizar archivos por extensión automaticamente.")
+    print(" 2. Organizar archivos que contengan cierta palabra en su nombre.")
+    print(" 3. Organizar archivos con cierto filetype y cierta palabra en su nombre.")
+    print(" 4. Organizar archivos por categoría.")
+    print(" 0. Cancelar")
     eleccion = int(input("Ingrese la opción deseada: "))
 
     match eleccion:
         case 0:
             menu = 0
+
         case 1: #Organizar archivos por extensión automaticamente
             for file in files: 
                 extension = (os.path.splitext(file))[1].replace('.','')
@@ -40,6 +63,7 @@ while menu == 1:
                 else:
                     os.makedirs(path+'/'+extension)
                     shutil.move(path+'/'+file,path+'/'+extension+'/'+file)
+
         case 2: #Organizar archivos con cierto filetype y cierta palabra en su nombre.
             palabra = input("Ingrese la palabra: ")
             palabra.lower()
@@ -100,6 +124,25 @@ while menu == 1:
                 print(f"No se encontraron archivos con la palabra '{palabra}' y la extensión '{ext}'")        
             else:
                 print(f"Se encontraron y guardaron {count} archivos con la palabra '{palabra}' y la extension '{ext}' en ellos.")
+        case 4:
+            categorias = EXT_DICT.keys()
+            extensiones_presentes = set(extensiones) # Elimino duplicados
+            for key,values in EXT_DICT.items():
+                for extension in extensiones_presentes:
+                    if extension in values:
+                        if os.path.exists(path+'/'+key):
+                            break
+                        else:
+                            os.makedirs(path+'/'+key)
+            
+            for file in files: 
+                extension = (os.path.splitext(file))[1].replace('.','')
+                for key,values in EXT_DICT.items():
+                    if extension in values:
+                    
+                        shutil.move(path+'/'+file,path+'/'+key+'/'+file)
+                        break
+
         case _:
             print("El número ingresado no es válido, inténtelo de nuevo.")
     

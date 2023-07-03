@@ -1,4 +1,8 @@
-
+Archivos/
+Copia/
+dist/
+build/
 *.jpg
 *.pdf
 *.png
+*.spec
